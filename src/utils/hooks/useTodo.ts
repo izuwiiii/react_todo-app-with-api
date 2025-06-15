@@ -128,7 +128,9 @@ export const useTodo = () => {
       if (todos.some(someTodo => !someTodo.completed) && todo.completed) {
         return todo;
       }
+
       setUpdatingTodosIds(prev => [...prev, todo.id]);
+
       return updateTodo(todo.id, {
         completed: todos.some(someTodo => !someTodo.completed),
       })
@@ -188,6 +190,6 @@ export const useTodo = () => {
     updatingTodoId,
     handleUpdateTodo,
     handleUpdateTodos,
-    updatingTodosIds
+    updatingTodosIds,
   };
 };
