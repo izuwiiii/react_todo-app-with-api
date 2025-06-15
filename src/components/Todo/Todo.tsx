@@ -10,6 +10,7 @@ type TodoProps = {
   handleUpdateTodo?: (todoId: number, data: unknown) => void;
   updatingTodoId?: number | null;
   isUpdatingTodos?: boolean;
+  updatingTodosIds?: number[];
 };
 
 export const Todo: React.FC<TodoProps> = ({
@@ -18,13 +19,13 @@ export const Todo: React.FC<TodoProps> = ({
   deletingTodoId,
   handleUpdateTodo,
   updatingTodoId,
-  isUpdatingTodos,
+  updatingTodosIds,
 }) => {
   const isTodoLoaderActive =
     todo?.id === 0 ||
     todo?.id === deletingTodoId ||
     todo?.id === updatingTodoId ||
-    isUpdatingTodos;
+    updatingTodosIds?.includes(todo?.id || 1);
 
   return (
     <div data-cy="Todo" className={cn('todo', { completed: todo?.completed })}>

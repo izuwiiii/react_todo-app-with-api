@@ -9,7 +9,7 @@ export const useTodo = () => {
     ErrorMessages.None,
   );
   const [isLoading, setIsLoading] = useState(false);
-  const [isUpdatingTodos, setIsUpdatingTodos] = useState(false);
+  const [updatingTodosIds, setUpdatingTodosIds] = useState<number[]>([]);
   const [todos, setTodos] = useState<TodoType[]>([]);
   const [filterOption, setFilterOption] = useState<FilterOptions>(
     FilterOptions.All,
@@ -110,6 +110,7 @@ export const useTodo = () => {
               ...todo,
               completed: !isCompleted,
             };
+
             return todo?.id === todoId ? newTodo : todo;
           }),
         );
@@ -123,8 +124,11 @@ export const useTodo = () => {
   };
 
   const handleUpdateTodos = () => {
-    setIsUpdatingTodos(true);
     todos.map(todo => {
+      if (todos.some(someTodo => !someTodo.completed) && todo.completed) {
+        return todo;
+      }
+      setUpdatingTodosIds(prev => [...prev, todo.id]);
       return updateTodo(todo.id, {
         completed: todos.some(someTodo => !someTodo.completed),
       })
@@ -142,7 +146,7 @@ export const useTodo = () => {
           setError(ErrorMessages.UnableToUpdate);
         })
         .finally(() => {
-          setIsUpdatingTodos(false);
+          setUpdatingTodosIds([]);
         });
     });
   };
@@ -184,6 +188,6 @@ export const useTodo = () => {
     updatingTodoId,
     handleUpdateTodo,
     handleUpdateTodos,
-    isUpdatingTodos,
+    updatingTodosIds
   };
 };
