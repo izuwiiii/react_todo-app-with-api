@@ -1,26 +1,88 @@
-/* eslint-disable max-len */
+/* eslint-disable jsx-a11y/label-has-associated-control */
 /* eslint-disable jsx-a11y/control-has-associated-label */
 import React from 'react';
-import { UserWarning } from './UserWarning';
-
-const USER_ID = 0;
+import { ErrorMessage } from './components/ErrorMessage';
+import { Footer } from './components/Footer';
+import { Todo } from './components/Todo';
+import { Header } from './components/Header';
+import { useTodo } from './utils/hooks/useTodo';
 
 export const App: React.FC = () => {
-  if (!USER_ID) {
-    return <UserWarning />;
-  }
+  const {
+    errorMessage,
+    setErrorMessage,
+    isLoading,
+    todos,
+    filteredTodos,
+    filterOption,
+    setFilterOption,
+    handleDeleteTodo,
+    tempTodo,
+    deletingTodoId,
+    handleClearCompletedTodos,
+    focusInput,
+    setFocusInput,
+    query,
+    setQuery,
+    handleSubmitForm,
+    updatingTodoId,
+    handleUpdateTodo,
+    handleUpdateTodos,
+    isUpdatingTodos,
+  } = useTodo();
 
   return (
-    <section className="section container">
-      <p className="title is-4">
-        Copy all you need from the prev task:
-        <br />
-        <a href="https://github.com/mate-academy/react_todo-app-add-and-delete#react-todo-app-add-and-delete">
-          React Todo App - Add and Delete
-        </a>
-      </p>
+    <div className="todoapp">
+      <h1 className="todoapp__title">todos</h1>
 
-      <p className="subtitle">Styles are already copied</p>
-    </section>
+      <div className="todoapp__content">
+        <Header
+          todos={todos}
+          isLoading={isLoading}
+          todoDeleted={focusInput}
+          query={query}
+          setQuery={setQuery}
+          handleSubmitForm={handleSubmitForm}
+          handleUpdateTodos={handleUpdateTodos}
+        />
+
+        <section className="todoapp__main" data-cy="TodoList">
+          {filteredTodos.map(todo => (
+            <Todo
+              key={todo.id}
+              todo={todo}
+              isLoading={isLoading}
+              handleDeleteTodo={handleDeleteTodo}
+              deletingTodoId={deletingTodoId}
+              handleUpdateTodo={handleUpdateTodo}
+              updatingTodoId={updatingTodoId}
+              isUpdatingTodos={isUpdatingTodos}
+            />
+          ))}
+        </section>
+        {isLoading && (
+          <Todo
+            todo={tempTodo || null}
+            isLoading={isLoading}
+            handleDeleteTodo={handleDeleteTodo}
+          />
+        )}
+
+        {todos.length > 0 && (
+          <Footer
+            todos={todos}
+            filterOption={filterOption}
+            setFilterOption={setFilterOption}
+            handleClearCompletedTodos={handleClearCompletedTodos}
+            setFocusInput={setFocusInput}
+          />
+        )}
+      </div>
+
+      <ErrorMessage
+        errorMessage={errorMessage}
+        setErrorMessage={setErrorMessage}
+      />
+    </div>
   );
 };
