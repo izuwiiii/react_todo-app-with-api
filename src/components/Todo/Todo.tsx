@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { FormEvent, useEffect, useRef, useState } from 'react';
 import { TodoType } from '../../types/TodoType';
 import cn from 'classnames';
 
@@ -11,6 +11,17 @@ type TodoProps = {
   updatingTodoId?: number | null;
   isUpdatingTodos?: boolean;
   updatingTodosIds?: number[];
+  filteredTodos?: TodoType[];
+  todos?: TodoType[];
+  handleTodoEditSubmit?: (
+    todo: TodoType,
+    todoQuery: string,
+    setTodoQuery?: React.Dispatch<React.SetStateAction<string>>,
+    setIsEditing?: React.Dispatch<React.SetStateAction<boolean>>,
+    e?: React.FormEvent<HTMLFormElement>,
+  ) => void;
+  // query?: string;
+  // setQuery?: React.Dispatch<React.SetStateAction<string>>;
 };
 
 export const Todo: React.FC<TodoProps> = ({
@@ -20,12 +31,34 @@ export const Todo: React.FC<TodoProps> = ({
   handleUpdateTodo,
   updatingTodoId,
   updatingTodosIds,
+  handleTodoEditSubmit,
+  // filteredTodos,
 }) => {
   const isTodoLoaderActive =
     todo?.id === 0 ||
     todo?.id === deletingTodoId ||
     todo?.id === updatingTodoId ||
     updatingTodosIds?.includes(todo?.id || 1);
+
+  const [isEditing, setIsEditing] = useState(false);
+  const [todoQuery, setTodoQuery] = useState(todo?.title || '');
+  const inputField = useRef<HTMLInputElement>(null);
+
+  const handleTodoEdit = (e: FormEvent) => {
+    e.preventDefault();
+    setIsEditing(true);
+  };
+
+  const handleTodoEditCancel = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Escape') {
+      setTodoQuery(todo?.title || '');
+      setIsEditing(false);
+    }
+  };
+
+  useEffect(() => {
+    inputField.current?.focus();
+  }, [isEditing]);
 
   return (
     <div data-cy="Todo" className={cn('todo', { completed: todo?.completed })}>
@@ -42,19 +75,56 @@ export const Todo: React.FC<TodoProps> = ({
         />
       </label>
 
-      {false ? (
-        <form>
+      {isEditing ? (
+        <form
+          onSubmit={e =>
+            handleTodoEditSubmit?.(
+              todo || {
+                title: '',
+                id: 0,
+                userId: 3085,
+                completed: false,
+              },
+              todoQuery,
+              setTodoQuery,
+              setIsEditing,
+              e,
+            )
+          }
+        >
           <input
             data-cy="TodoTitleField"
             type="text"
             className="todo__title-field"
             placeholder="Empty todo will be deleted"
-            value="Todo is being edited now"
+            ref={inputField}
+            value={todoQuery}
+            onKeyUp={e => handleTodoEditCancel(e)}
+            onChange={e => {
+              setTodoQuery(e.target.value);
+            }}
+            onBlur={() => {
+              setIsEditing(false);
+              handleTodoEditSubmit?.(
+                todo || {
+                  title: '',
+                  id: 0,
+                  userId: 3085,
+                  completed: false,
+                },
+                todoQuery,
+                setTodoQuery,
+              );
+            }}
           />
         </form>
       ) : (
         <>
-          <span data-cy="TodoTitle" className="todo__title">
+          <span
+            data-cy="TodoTitle"
+            className="todo__title"
+            onDoubleClick={e => handleTodoEdit(e)}
+          >
             {todo?.title}
           </span>
           <button

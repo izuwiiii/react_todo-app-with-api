@@ -29,6 +29,7 @@ export const App: React.FC = () => {
     handleUpdateTodo,
     handleUpdateTodos,
     updatingTodosIds,
+    handleTodoEditSubmit,
   } = useTodo();
 
   return (
@@ -57,6 +58,9 @@ export const App: React.FC = () => {
               handleUpdateTodo={handleUpdateTodo}
               updatingTodoId={updatingTodoId}
               updatingTodosIds={updatingTodosIds}
+              filteredTodos={filteredTodos}
+              todos={todos}
+              handleTodoEditSubmit={handleTodoEditSubmit}
             />
           ))}
         </section>

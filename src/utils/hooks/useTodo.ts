@@ -80,7 +80,10 @@ export const useTodo = () => {
     });
   };
 
-  const handleDeleteTodo = (todoId: number) => {
+  const handleDeleteTodo = (
+    todoId: number,
+    setIsEditing?: React.Dispatch<React.SetStateAction<boolean>>,
+  ) => {
     setDeletingTodoId(todoId);
 
     deleteTodo(todoId)
@@ -91,10 +94,13 @@ export const useTodo = () => {
       })
       .catch(() => {
         setError(ErrorMessages.UnableToDelete);
+        setIsEditing?.(true);
       })
       .finally(() => {
         setDeletingTodoId(null);
-        setFocusInput(prev => prev + 1);
+        if (!setIsEditing) {
+          setFocusInput(prev => prev + 1);
+        }
       });
   };
 
@@ -169,6 +175,61 @@ export const useTodo = () => {
       );
   };
 
+  const handleTodoEditSubmit = (
+    todo: TodoType,
+    todoQuery: string,
+    setTodoQuery?: React.Dispatch<React.SetStateAction<string>>,
+    setIsEditing?: React.Dispatch<React.SetStateAction<boolean>>,
+    e?: FormEvent,
+  ) => {
+    e?.preventDefault();
+
+    if (todo.title.trim() === todoQuery.trim()) {
+      setIsEditing?.(false);
+      setTodoQuery?.(todoQuery.trim());
+
+      return;
+    }
+
+    if (!todoQuery) {
+      handleDeleteTodo(todo.id, setIsEditing);
+
+      return;
+    }
+
+    const forUpdate = { title: todoQuery.trim() };
+
+    setUpdatingTodoId(todo?.id);
+
+    let hasError = false;
+
+    updateTodo(todo?.id || 1, forUpdate)
+      .then(() => {
+        setTodos(currentTodos =>
+          currentTodos.map(currentTodo => {
+            const newTodo = {
+              ...currentTodo,
+              title: todoQuery.trim(),
+            };
+
+            return todo?.id === currentTodo.id ? newTodo : currentTodo;
+          }),
+        );
+      })
+      .catch(() => {
+        hasError = true;
+        setErrorMessage(ErrorMessages.UnableToUpdate);
+        setTodoQuery?.(todo.title.trim());
+        setIsEditing?.(true);
+      })
+      .finally(() => {
+        setUpdatingTodoId(null);
+        if (!hasError) {
+          setIsEditing?.(false);
+        }
+      });
+  };
+
   return {
     errorMessage,
     setErrorMessage,
@@ -191,5 +252,6 @@ export const useTodo = () => {
     handleUpdateTodo,
     handleUpdateTodos,
     updatingTodosIds,
+    handleTodoEditSubmit,
   };
 };
