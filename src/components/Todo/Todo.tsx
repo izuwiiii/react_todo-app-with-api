@@ -20,8 +20,6 @@ type TodoProps = {
     setIsEditing?: React.Dispatch<React.SetStateAction<boolean>>,
     e?: React.FormEvent<HTMLFormElement>,
   ) => void;
-  // query?: string;
-  // setQuery?: React.Dispatch<React.SetStateAction<string>>;
 };
 
 export const Todo: React.FC<TodoProps> = ({
@@ -32,7 +30,6 @@ export const Todo: React.FC<TodoProps> = ({
   updatingTodoId,
   updatingTodosIds,
   handleTodoEditSubmit,
-  // filteredTodos,
 }) => {
   const isTodoLoaderActive =
     todo?.id === 0 ||

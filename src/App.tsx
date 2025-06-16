@@ -6,6 +6,8 @@ import { Footer } from './components/Footer';
 import { Todo } from './components/Todo';
 import { Header } from './components/Header';
 import { useTodo } from './utils/hooks/useTodo';
+import './App.css';
+import { TransitionGroup, CSSTransition } from 'react-transition-group';
 
 export const App: React.FC = () => {
   const {
@@ -48,29 +50,35 @@ export const App: React.FC = () => {
         />
 
         <section className="todoapp__main" data-cy="TodoList">
-          {filteredTodos.map(todo => (
-            <Todo
-              key={todo.id}
-              todo={todo}
-              isLoading={isLoading}
-              handleDeleteTodo={handleDeleteTodo}
-              deletingTodoId={deletingTodoId}
-              handleUpdateTodo={handleUpdateTodo}
-              updatingTodoId={updatingTodoId}
-              updatingTodosIds={updatingTodosIds}
-              filteredTodos={filteredTodos}
-              todos={todos}
-              handleTodoEditSubmit={handleTodoEditSubmit}
-            />
-          ))}
+          <TransitionGroup>
+            {filteredTodos.map(todo => (
+              <CSSTransition key={todo.id} timeout={300} classNames="item">
+                <Todo
+                  key={todo.id}
+                  todo={todo}
+                  isLoading={isLoading}
+                  handleDeleteTodo={handleDeleteTodo}
+                  deletingTodoId={deletingTodoId}
+                  handleUpdateTodo={handleUpdateTodo}
+                  updatingTodoId={updatingTodoId}
+                  updatingTodosIds={updatingTodosIds}
+                  filteredTodos={filteredTodos}
+                  todos={todos}
+                  handleTodoEditSubmit={handleTodoEditSubmit}
+                />
+              </CSSTransition>
+            ))}
+            {isLoading && (
+              <CSSTransition key={0} timeout={300} classNames="temp-item">
+                <Todo
+                  todo={tempTodo || null}
+                  isLoading={isLoading}
+                  handleDeleteTodo={handleDeleteTodo}
+                />
+              </CSSTransition>
+            )}
+          </TransitionGroup>
         </section>
-        {isLoading && (
-          <Todo
-            todo={tempTodo || null}
-            isLoading={isLoading}
-            handleDeleteTodo={handleDeleteTodo}
-          />
-        )}
 
         {todos.length > 0 && (
           <Footer
