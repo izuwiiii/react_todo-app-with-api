@@ -3,11 +3,9 @@
 import React from 'react';
 import { ErrorMessage } from './components/ErrorMessage';
 import { Footer } from './components/Footer';
-import { Todo } from './components/Todo';
 import { Header } from './components/Header';
 import { useTodo } from './utils/hooks/useTodo';
-import './App.css';
-import { TransitionGroup, CSSTransition } from 'react-transition-group';
+import { TodoList } from './components/TodoList';
 
 export const App: React.FC = () => {
   const {
@@ -20,14 +18,12 @@ export const App: React.FC = () => {
     setFilterOption,
     handleDeleteTodo,
     tempTodo,
-    deletingTodoId,
     handleClearCompletedTodos,
     focusInput,
     setFocusInput,
     query,
     setQuery,
     handleSubmitForm,
-    updatingTodoId,
     handleUpdateTodo,
     handleUpdateTodos,
     updatingTodosIds,
@@ -49,36 +45,16 @@ export const App: React.FC = () => {
           handleUpdateTodos={handleUpdateTodos}
         />
 
-        <section className="todoapp__main" data-cy="TodoList">
-          <TransitionGroup>
-            {filteredTodos.map(todo => (
-              <CSSTransition key={todo.id} timeout={300} classNames="item">
-                <Todo
-                  key={todo.id}
-                  todo={todo}
-                  isLoading={isLoading}
-                  handleDeleteTodo={handleDeleteTodo}
-                  deletingTodoId={deletingTodoId}
-                  handleUpdateTodo={handleUpdateTodo}
-                  updatingTodoId={updatingTodoId}
-                  updatingTodosIds={updatingTodosIds}
-                  filteredTodos={filteredTodos}
-                  todos={todos}
-                  handleTodoEditSubmit={handleTodoEditSubmit}
-                />
-              </CSSTransition>
-            ))}
-            {isLoading && (
-              <CSSTransition key={0} timeout={300} classNames="temp-item">
-                <Todo
-                  todo={tempTodo || null}
-                  isLoading={isLoading}
-                  handleDeleteTodo={handleDeleteTodo}
-                />
-              </CSSTransition>
-            )}
-          </TransitionGroup>
-        </section>
+        <TodoList
+          tempTodo={tempTodo || null}
+          isLoading={isLoading}
+          handleDeleteTodo={handleDeleteTodo}
+          handleTodoEditSubmit={handleTodoEditSubmit}
+          handleUpdateTodo={handleUpdateTodo}
+          updatingTodosIds={updatingTodosIds}
+          filteredTodos={filteredTodos}
+          todos={todos}
+        />
 
         {todos.length > 0 && (
           <Footer

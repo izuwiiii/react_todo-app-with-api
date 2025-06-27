@@ -15,12 +15,10 @@ export const useTodo = () => {
     FilterOptions.All,
   );
   const [tempTodo, setTempTodo] = useState<TodoType>();
-  const [deletingTodoId, setDeletingTodoId] = useState<number | null>(null);
-  const [updatingTodoId, setUpdatingTodoId] = useState<number | null>(null);
   const [focusInput, setFocusInput] = useState(0);
   const [query, setQuery] = useState('');
 
-  const filteredTodos = [...todos].filter(todo => {
+  const filteredTodos = todos.filter(todo => {
     switch (filterOption) {
       case FilterOptions.Active:
         return !todo.completed;
@@ -31,9 +29,9 @@ export const useTodo = () => {
     }
   });
 
-  function setError(error: ErrorMessages) {
+  const setError = (error: ErrorMessages) => {
     setErrorMessage(error);
-  }
+  };
 
   useEffect(() => {
     getTodos()
@@ -84,7 +82,7 @@ export const useTodo = () => {
     todoId: number,
     setIsEditing?: React.Dispatch<React.SetStateAction<boolean>>,
   ) => {
-    setDeletingTodoId(todoId);
+    setUpdatingTodosIds(prev => [...prev, todoId]);
 
     deleteTodo(todoId)
       .then(() => {
@@ -97,7 +95,8 @@ export const useTodo = () => {
         setIsEditing?.(true);
       })
       .finally(() => {
-        setDeletingTodoId(null);
+        setUpdatingTodosIds([]);
+
         if (!setIsEditing) {
           setFocusInput(prev => prev + 1);
         }
@@ -105,19 +104,22 @@ export const useTodo = () => {
   };
 
   const handleUpdateTodo = (todoId: number, data: unknown) => {
-    setUpdatingTodoId(todoId);
+    setUpdatingTodosIds(prev => [...prev, todoId]);
 
     updateTodo(todoId, data)
       .then(() => {
         setTodos(currentTodos =>
           currentTodos.map(todo => {
-            const isCompleted = todo.completed;
-            const newTodo = {
-              ...todo,
-              completed: !isCompleted,
-            };
-
-            return todo?.id === todoId ? newTodo : todo;
+            if (todo?.id === todoId) {
+              const isCompleted = todo.completed;
+              const newTodo = {
+                ...todo,
+                completed: !isCompleted,
+              };
+              return newTodo;
+            } else {
+              return todo;
+            }
           }),
         );
       })
@@ -125,7 +127,7 @@ export const useTodo = () => {
         setError(ErrorMessages.UnableToUpdate);
       })
       .finally(() => {
-        setUpdatingTodoId(null);
+        setUpdatingTodosIds([]);
       });
   };
 
@@ -199,7 +201,7 @@ export const useTodo = () => {
 
     const forUpdate = { title: todoQuery.trim() };
 
-    setUpdatingTodoId(todo?.id);
+    setUpdatingTodosIds(prev => [...prev, todo.id]);
 
     let hasError = false;
 
@@ -223,7 +225,8 @@ export const useTodo = () => {
         setIsEditing?.(true);
       })
       .finally(() => {
-        setUpdatingTodoId(null);
+        setUpdatingTodosIds([]);
+
         if (!hasError) {
           setIsEditing?.(false);
         }
@@ -241,14 +244,12 @@ export const useTodo = () => {
     handleCreateTodo,
     handleDeleteTodo,
     tempTodo,
-    deletingTodoId,
     handleClearCompletedTodos,
     focusInput,
     setFocusInput,
     query,
     setQuery,
     handleSubmitForm,
-    updatingTodoId,
     handleUpdateTodo,
     handleUpdateTodos,
     updatingTodosIds,

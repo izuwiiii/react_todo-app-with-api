@@ -15,7 +15,7 @@ export const ErrorMessage: React.FC<ErrorMessageProps> = ({
     setTimeout(() => {
       setErrorMessage(ErrorMessages.None);
     }, 3000);
-  }, [errorMessage]);
+  }, [errorMessage, setErrorMessage]);
 
   return (
     <div
@@ -30,7 +30,6 @@ export const ErrorMessage: React.FC<ErrorMessageProps> = ({
         className="delete"
         onClick={() => setErrorMessage(ErrorMessages.None)}
       />
-      {/* show only one message at a time */}
       {errorMessage}
     </div>
   );

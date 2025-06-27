@@ -1,6 +1,7 @@
 import React, { FormEvent, useEffect, useRef, useState } from 'react';
 import { TodoType } from '../../types/TodoType';
 import cn from 'classnames';
+import { USER_ID } from '../../api/todos';
 
 type TodoProps = {
   todo: TodoType | null;
@@ -25,17 +26,18 @@ type TodoProps = {
 export const Todo: React.FC<TodoProps> = ({
   todo,
   handleDeleteTodo,
-  deletingTodoId,
   handleUpdateTodo,
-  updatingTodoId,
   updatingTodosIds,
   handleTodoEditSubmit,
 }) => {
+  const tempTodo = {
+    title: '',
+    id: 0,
+    userId: USER_ID,
+    completed: false,
+  };
   const isTodoLoaderActive =
-    todo?.id === 0 ||
-    todo?.id === deletingTodoId ||
-    todo?.id === updatingTodoId ||
-    updatingTodosIds?.includes(todo?.id || 1);
+    todo?.id === 0 || updatingTodosIds?.includes(todo?.id || 0);
 
   const [isEditing, setIsEditing] = useState(false);
   const [todoQuery, setTodoQuery] = useState(todo?.title || '');
@@ -76,12 +78,7 @@ export const Todo: React.FC<TodoProps> = ({
         <form
           onSubmit={e =>
             handleTodoEditSubmit?.(
-              todo || {
-                title: '',
-                id: 0,
-                userId: 3085,
-                completed: false,
-              },
+              todo || tempTodo,
               todoQuery,
               setTodoQuery,
               setIsEditing,
